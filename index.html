@@ -317,21 +317,22 @@
               <a href="https://github.com/Dazzlingkavya" target="_blank" rel="noreferrer">GitHub</a>
             </div>
           </div>
-          <form class="contact-form" aria-label="Contact form">
+          <form class="contact-form" id="contact-form" aria-label="Contact form" novalidate>
             <div class="field">
               <label for="name">Name</label>
-              <input id="name" name="name" type="text" placeholder="Your name" />
+              <input id="name" name="name" type="text" placeholder="Your name" required />
             </div>
             <div class="field">
               <label for="email">Email</label>
-              <input id="email" name="email" type="email" placeholder="Your email" />
+              <input id="email" name="email" type="email" placeholder="Your email" required />
             </div>
             <div class="field">
               <label for="message">Message</label>
-              <textarea id="message" name="message" rows="4" placeholder="Tell me about your opportunity"></textarea>
+              <textarea id="message" name="message" rows="4" placeholder="Tell me about your opportunity" required></textarea>
             </div>
-            <button class="btn btn-primary" type="button">Send Message</button>
-            <p class="form-note">This form is a UI demo and does not submit data.</p>
+            <button class="btn btn-primary" id="contact-submit" type="submit">Send Message</button>
+            <p class="form-note">Messages are sent securely using EmailJS after you add your own service credentials.</p>
+            <p class="form-alert" id="form-alert" role="status" aria-live="polite"></p>
           </form>
         </div>
       </div>
@@ -344,6 +345,7 @@
     </div>
   </footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
