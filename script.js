@@ -1,190 +1,609 @@
-// Do not open this page via file://. Use Live Server in VS Code or run it on localhost.
-// EmailJS setup instructions:
-// 1. Use Live Server in VS Code or serve the site from localhost or a deployed domain.
-// 2. Replace YOUR_SERVICE_ID, YOUR_TEMPLATE_ID, and YOUR_PUBLIC_KEY with values from the EmailJS dashboard.
-// 3. In your EmailJS template, make sure the variables match exactly: {{name}}, {{email}}, and {{message}}.
+/* =====================================================
+   KAVYA S — PORTFOLIO JAVASCRIPT
+   ===================================================== */
 
-const navToggle = document.querySelector('.nav-toggle');
-const navLinks = document.querySelector('.nav-links');
+
+/* ================= MOBILE NAV ================= */
+
+const navToggle = document.querySelector(".nav-toggle");
+const navLinks = document.querySelector(".nav-links");
 
 if (navToggle && navLinks) {
-  navToggle.addEventListener('click', () => {
-    const isOpen = navLinks.classList.toggle('open');
-    navToggle.setAttribute('aria-expanded', String(isOpen));
+
+  navToggle.addEventListener("click", () => {
+
+    const isOpen =
+      navLinks.classList.toggle("open");
+
+    navToggle.setAttribute(
+      "aria-expanded",
+      String(isOpen)
+    );
+
   });
 
-  navLinks.querySelectorAll('a').forEach((link) => {
-    link.addEventListener('click', () => {
-      navLinks.classList.remove('open');
-      navToggle.setAttribute('aria-expanded', 'false');
+
+  navLinks.querySelectorAll("a").forEach((link) => {
+
+    link.addEventListener("click", () => {
+
+      navLinks.classList.remove("open");
+
+      navToggle.setAttribute(
+        "aria-expanded",
+        "false"
+      );
+
     });
+
   });
+
 }
 
-const revealItems = document.querySelectorAll('.section, .project-card, .skill-card, .timeline-item, .edu-card');
 
-revealItems.forEach((item) => item.classList.add('reveal'));
+/* ================= HEADER SCROLL ================= */
 
-document.querySelectorAll('[data-placeholder="true"]').forEach((link) => {
-  link.addEventListener('click', (event) => event.preventDefault());
-});
+const header =
+  document.querySelector(".site-header");
 
-const observer = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('visible');
-        observer.unobserve(entry.target);
-      }
-    });
-  },
-  { threshold: 0.15 }
+function updateHeader() {
+
+  if (!header) return;
+
+  if (window.scrollY > 30) {
+
+    header.classList.add("scrolled");
+
+  } else {
+
+    header.classList.remove("scrolled");
+
+  }
+
+}
+
+window.addEventListener(
+  "scroll",
+  updateHeader,
+  { passive: true }
 );
 
-revealItems.forEach((item) => observer.observe(item));
+updateHeader();
+
+
+/* ================= SCROLL REVEAL ================= */
+
+const revealItems =
+  document.querySelectorAll(".reveal");
+
+const revealObserver =
+  new IntersectionObserver(
+    (entries, observer) => {
+
+      entries.forEach((entry) => {
+
+        if (!entry.isIntersecting) {
+          return;
+        }
+
+        entry.target.classList.add("visible");
+
+        observer.unobserve(entry.target);
+
+      });
+
+    },
+    {
+      threshold: 0.12,
+      rootMargin: "0px 0px -40px 0px"
+    }
+  );
+
+
+revealItems.forEach((item, index) => {
+
+  item.style.transitionDelay =
+    `${Math.min(index * 35, 250)}ms`;
+
+  revealObserver.observe(item);
+
+});
+
+
+/* ================= EMAILJS ================= */
 
 const EMAILJS_CONFIG = {
-  serviceId: 'service_xppfscw',
-  templateId: 'template_kw7a97p',
-  publicKey: '8QNgTmWWXFyXROLyl'
+
+  serviceId: "service_xppfscw",
+
+  templateId: "template_kw7a97p",
+
+  publicKey: "8QNgTmWWXFyXROLyl"
+
 };
 
-const contactForm = document.querySelector('#contact-form');
-const nameInput = document.querySelector('#name');
-const emailInput = document.querySelector('#email');
-const messageInput = document.querySelector('#message');
-const submitButton = document.querySelector('#contact-submit');
-const formAlert = document.querySelector('#form-alert');
+
+const contactForm =
+  document.querySelector("#contact-form");
+
+const nameInput =
+  document.querySelector("#name");
+
+const emailInput =
+  document.querySelector("#email");
+
+const messageInput =
+  document.querySelector("#message");
+
+const submitButton =
+  document.querySelector("#contact-submit");
+
+const formAlert =
+  document.querySelector("#form-alert");
+
+
+/* Initialize EmailJS */
 
 function initializeEmailJS() {
-  if (!window.emailjs || window.location.protocol === 'file:' || !isConfiguredForEmailJS()) {
+
+  if (
+    !window.emailjs ||
+    window.location.protocol === "file:"
+  ) {
+
     return false;
   }
 
-  emailjs.init(EMAILJS_CONFIG.publicKey);
+  emailjs.init({
+    publicKey:
+      EMAILJS_CONFIG.publicKey
+  });
+
   return true;
 }
 
-function setFieldValidity(field, isValid) {
-  if (field) {
-    field.setAttribute('aria-invalid', String(!isValid));
-  }
+
+/* ================= FORM VALIDATION ================= */
+
+function setFieldValidity(
+  field,
+  valid
+) {
+
+  if (!field) return;
+
+  field.setAttribute(
+    "aria-invalid",
+    String(!valid)
+  );
+
 }
+
 
 function resetFieldValidity() {
-  [nameInput, emailInput, messageInput].forEach((field) => setFieldValidity(field, true));
+
+  [
+    nameInput,
+    emailInput,
+    messageInput
+
+  ].forEach((field) => {
+
+    setFieldValidity(
+      field,
+      true
+    );
+
+  });
+
 }
 
-function showFormAlert(message, type) {
-  if (!formAlert) {
-    return;
-  }
-
-  formAlert.textContent = message;
-  formAlert.className = 'form-alert';
-
-  if (type) {
-    formAlert.classList.add(`is-${type}`, 'is-visible');
-  }
-}
-
-function setSubmittingState(isSubmitting) {
-  if (!submitButton) {
-    return;
-  }
-
-  submitButton.disabled = isSubmitting;
-  submitButton.textContent = isSubmitting ? 'Sending...' : 'Send Message';
-}
-
-function isConfiguredForEmailJS() {
-  return !Object.values(EMAILJS_CONFIG).some((value) => value.startsWith('YOUR_'));
-}
 
 function validateForm() {
-  const name = nameInput.value.trim();
-  const email = emailInput.value.trim();
-  const message = messageInput.value.trim();
-  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const name =
+    nameInput.value.trim();
+
+  const email =
+    emailInput.value.trim();
+
+  const message =
+    messageInput.value.trim();
+
+
+  const emailPattern =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 
   resetFieldValidity();
 
+
   if (!name) {
-    setFieldValidity(nameInput, false);
-    return { isValid: false, message: 'Please enter your name.' };
+
+    setFieldValidity(
+      nameInput,
+      false
+    );
+
+    return {
+      valid: false,
+      message:
+        "Please enter your name."
+    };
+
   }
 
-  if (!email || !emailPattern.test(email)) {
-    setFieldValidity(emailInput, false);
-    return { isValid: false, message: 'Please enter a valid email address.' };
+
+  if (
+    !email ||
+    !emailPattern.test(email)
+  ) {
+
+    setFieldValidity(
+      emailInput,
+      false
+    );
+
+    return {
+      valid: false,
+      message:
+        "Please enter a valid email address."
+    };
+
   }
+
 
   if (!message) {
-    setFieldValidity(messageInput, false);
-    return { isValid: false, message: 'Please enter your message.' };
+
+    setFieldValidity(
+      messageInput,
+      false
+    );
+
+    return {
+      valid: false,
+      message:
+        "Please enter your message."
+    };
+
   }
 
+
   return {
-    isValid: true,
-    data: { name, email, message }
+
+    valid: true,
+
+    data: {
+      name,
+      email,
+      message
+    }
+
   };
+
 }
 
-function sendContactMessage() {
-  console.log('Sending EmailJS payload:', {
-    name: nameInput.value.trim(),
-    email: emailInput.value.trim(),
-    message: messageInput.value.trim()
-  });
 
-  return emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.templateId, {
-    name: nameInput.value.trim(),
-    email: emailInput.value.trim(),
-    message: messageInput.value.trim()
-  });
+/* ================= FORM MESSAGE ================= */
+
+function showFormAlert(
+  message,
+  type = ""
+) {
+
+  if (!formAlert) return;
+
+  formAlert.textContent =
+    message;
+
+  formAlert.className =
+    "form-alert";
+
+  if (type) {
+
+    formAlert.classList.add(
+      type
+    );
+
+  }
+
 }
 
-async function handleContactSubmit(event) {
+
+/* ================= SUBMIT STATE ================= */
+
+function setSubmittingState(
+  submitting
+) {
+
+  if (!submitButton) return;
+
+  submitButton.disabled =
+    submitting;
+
+  submitButton.innerHTML =
+    submitting
+
+      ? `
+        Sending...
+        <i class="fa-solid fa-spinner fa-spin"></i>
+      `
+
+      : `
+        Send Message
+        <i class="fa-solid fa-paper-plane"></i>
+      `;
+
+}
+
+
+/* ================= SEND EMAIL ================= */
+
+async function sendContactMessage(
+  data
+) {
+
+  return emailjs.send(
+
+    EMAILJS_CONFIG.serviceId,
+
+    EMAILJS_CONFIG.templateId,
+
+    {
+      name: data.name,
+      email: data.email,
+      message: data.message
+    }
+
+  );
+
+}
+
+
+/* ================= FORM SUBMIT ================= */
+
+async function handleContactSubmit(
+  event
+) {
+
   event.preventDefault();
+
 
   if (!contactForm) {
     return;
   }
 
-  if (window.location.protocol === 'file:') {
-    showFormAlert('Open this site using Live Server or localhost. EmailJS will not work from file://.', 'error');
+
+  if (
+    window.location.protocol === "file:"
+  ) {
+
+    showFormAlert(
+      "Please open the website using Live Server or localhost.",
+      "error"
+    );
+
     return;
   }
 
-  const validation = validateForm();
 
-  if (!validation.isValid) {
-    showFormAlert(validation.message, 'error');
+  const validation =
+    validateForm();
+
+
+  if (!validation.valid) {
+
+    showFormAlert(
+      validation.message,
+      "error"
+    );
+
     return;
   }
 
-  if (!window.emailjs || !isConfiguredForEmailJS()) {
-    showFormAlert('Replace the EmailJS placeholder keys in script.js before sending messages.', 'error');
+
+  if (!window.emailjs) {
+
+    showFormAlert(
+      "Email service could not be loaded. Please try again.",
+      "error"
+    );
+
     return;
   }
+
 
   setSubmittingState(true);
-  showFormAlert('', '');
+
+  showFormAlert("");
+
 
   try {
-    await sendContactMessage();
+
+    await sendContactMessage(
+      validation.data
+    );
+
+
     contactForm.reset();
+
     resetFieldValidity();
-    showFormAlert('Message sent successfully!', 'success');
+
+
+    showFormAlert(
+      "Message sent successfully! I'll get back to you soon.",
+      "success"
+    );
+
+
   } catch (error) {
-    console.error('EmailJS Error:', error);
-    showFormAlert('Failed to send. Try again.', 'error');
+
+    console.error(
+      "EmailJS Error:",
+      error
+    );
+
+
+    showFormAlert(
+      "Something went wrong. Please email me directly instead.",
+      "error"
+    );
+
+
   } finally {
+
     setSubmittingState(false);
+
   }
+
 }
 
+
+/* ================= INITIALIZE ================= */
+
 if (contactForm) {
+
   initializeEmailJS();
-  contactForm.addEventListener('submit', handleContactSubmit);
+
+  contactForm.addEventListener(
+    "submit",
+    handleContactSubmit
+  );
+
+}
+
+
+/* ================= SMOOTH ACTIVE NAV ================= */
+
+const sections =
+  document.querySelectorAll(
+    "section[id]"
+  );
+
+const navigationLinks =
+  document.querySelectorAll(
+    ".nav-links a"
+  );
+
+
+const activeSectionObserver =
+  new IntersectionObserver(
+
+    (entries) => {
+
+      entries.forEach((entry) => {
+
+        if (!entry.isIntersecting) {
+          return;
+        }
+
+
+        navigationLinks.forEach(
+          (link) => {
+
+            link.classList.remove(
+              "active"
+            );
+
+            if (
+              link.getAttribute("href") ===
+              `#${entry.target.id}`
+            ) {
+
+              link.classList.add(
+                "active"
+              );
+
+            }
+
+          }
+        );
+
+      });
+
+    },
+
+    {
+      threshold: 0.35
+    }
+
+  );
+
+
+sections.forEach((section) => {
+
+  activeSectionObserver.observe(
+    section
+  );
+
+});
+
+
+/* ================= CURSOR EFFECT ================= */
+
+/*
+   Very subtle cursor glow.
+   Disabled automatically on touch devices.
+*/
+
+const finePointer =
+  window.matchMedia(
+    "(pointer: fine)"
+  ).matches;
+
+
+if (finePointer) {
+
+  const cursorGlow =
+    document.createElement("div");
+
+  cursorGlow.style.position =
+    "fixed";
+
+  cursorGlow.style.width =
+    "180px";
+
+  cursorGlow.style.height =
+    "180px";
+
+  cursorGlow.style.borderRadius =
+    "50%";
+
+  cursorGlow.style.pointerEvents =
+    "none";
+
+  cursorGlow.style.zIndex =
+    "-1";
+
+  cursorGlow.style.background =
+    "rgba(122,45,58,0.045)";
+
+  cursorGlow.style.filter =
+    "blur(30px)";
+
+  cursorGlow.style.transform =
+    "translate(-50%, -50%)";
+
+  cursorGlow.style.transition =
+    "left 0.15s ease, top 0.15s ease";
+
+  document.body.appendChild(
+    cursorGlow
+  );
+
+
+  window.addEventListener(
+    "mousemove",
+    (event) => {
+
+      cursorGlow.style.left =
+        `${event.clientX}px`;
+
+      cursorGlow.style.top =
+        `${event.clientY}px`;
+
+    },
+    { passive: true }
+  );
+
 }
